@@ -12,7 +12,7 @@
 --- - Manage notifications (add, update, remove, clear).
 ---
 --- - Custom |vim.notify()| implementation. To adjust, use |MiniNotify.make_notify()|
----   after calling |MiniNotify.setup()|.
+---   or save-restore `vim.notify` manually after calling |MiniNotify.setup()|.
 ---
 --- - Automated show of LSP progress report.
 ---
@@ -278,7 +278,7 @@ MiniNotify.config = {
 ---   require('mini.notify').setup()
 ---   vim.notify = MiniNotify.make_notify({ ERROR = { duration = 10000 } })
 --- <
---- To preserve default `vim.notify`: >lua
+--- To preserve original `vim.notify`: >lua
 ---
 ---   local notify_orig = vim.notify
 ---   require('mini.notify').setup()
