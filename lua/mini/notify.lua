@@ -1,10 +1,7 @@
 --- *mini.notify* Show notifications
---- *MiniNotify*
 ---
 --- MIT License Copyright (c) 2024 Evgeni Chasnovski
----
---- ==============================================================================
----
+
 --- Features:
 ---
 --- - Show one or more highlighted notifications in a single floating window.
@@ -33,22 +30,25 @@
 ---
 --- # Comparisons ~
 ---
---- - 'j-hui/fidget.nvim':
+--- - [j-hui/fidget.nvim](https://github.com/j-hui/fidget.nvim):
 ---     - Basic goals of providing interface for notifications are similar.
 ---     - Has more configuration options and visual effects, while this module
 ---       does not (by design).
 ---
---- - 'rcarriga/nvim-notify':
+--- - [rcarriga/nvim-notify](https://github.com/rcarriga/nvim-notify):
 ---     - Similar to 'j-hui/fidget.nvim'.
 ---
 --- # Highlight groups ~
 ---
---- * `MiniNotifyBorder` - window border.
---- * `MiniNotifyLspProgress` - notifications from built-in LSP progress report.
---- * `MiniNotifyNormal` - basic foreground/background highlighting.
---- * `MiniNotifyTitle` - window title.
+--- - `MiniNotifyBorder` - window border.
+--- - `MiniNotifyLspProgress` - notifications from built-in LSP progress report.
+--- - `MiniNotifyNormal` - basic foreground/background highlighting.
+--- - `MiniNotifyTitle` - window title.
 ---
---- To change any highlight group, modify it directly with |:highlight|.
+--- To change any highlight group, set it directly with |nvim_set_hl()|.
+---
+--- NOTE: |vim.notify()| override after |MiniNotify.make_notify()| uses own
+--- highlight groups per notification level.
 ---
 --- # Disabling ~
 ---
@@ -57,6 +57,7 @@
 --- of different scenarios and customization intentions, writing exact rules
 --- for disabling module's functionality is left to user. See
 --- |mini.nvim-disabling-recipes| for common recipes.
+---@tag MiniNotify
 
 --- # Notification specification ~
 ---
@@ -91,7 +92,7 @@ local H = {}
 --- Module setup
 ---
 --- This will also:
---- - Set |vim.notify| custom implementation (see |MiniNotify.make_notify()|).
+--- - Set |vim.notify()| custom implementation (see |MiniNotify.make_notify()|).
 --- - Clean the history. Use `MiniNotify.setup(MiniNotify.config)` to force
 ---   clean history while preserving the config.
 ---
@@ -122,9 +123,7 @@ MiniNotify.setup = function(config)
   vim.notify = MiniNotify.make_notify()
 end
 
---- Module config
----
---- Default values:
+--- Defaults ~
 ---@eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
 ---@text # Content ~
 ---
@@ -285,23 +284,23 @@ MiniNotify.config = {
 ---   vim.notify = notify_orig
 --- <
 ---@param opts table|nil Options to configure behavior of notification `level`
----   (as in |MiniNotfiy.add()|). Fields are the same as names of `vim.log.levels`
+---   (as in |MiniNotify.add()|). Fields are the same as names of `vim.log.levels`
 ---   with values being tables with possible fields:
----     - <duration> `(number)` - duration (in ms) of how much a notification
----       should be shown. If 0 or negative, notification is not shown at all.
----     - <hl_group> `(string)` - highlight group of notification.
+---   - <duration> `(number)` - duration (in ms) of how much a notification
+---     should be shown. If 0 or negative, notification is not shown at all.
+---   - <hl_group> `(string)` - highlight group of notification.
 ---   Only data different to default can be supplied.
 ---
 ---   Default: >lua
 ---
----     {
----       ERROR = { duration = 5000, hl_group = 'DiagnosticError'  },
----       WARN  = { duration = 5000, hl_group = 'DiagnosticWarn'   },
----       INFO  = { duration = 5000, hl_group = 'DiagnosticInfo'   },
----       DEBUG = { duration = 0,    hl_group = 'DiagnosticHint'   },
----       TRACE = { duration = 0,    hl_group = 'DiagnosticOk'     },
----       OFF   = { duration = 0,    hl_group = 'MiniNotifyNormal' },
----     }
+---   {
+---     ERROR = { duration = 5000, hl_group = 'DiagnosticError'  },
+---     WARN  = { duration = 5000, hl_group = 'DiagnosticWarn'   },
+---     INFO  = { duration = 5000, hl_group = 'DiagnosticInfo'   },
+---     DEBUG = { duration = 0,    hl_group = 'DiagnosticHint'   },
+---     TRACE = { duration = 0,    hl_group = 'DiagnosticOk'     },
+---     OFF   = { duration = 0,    hl_group = 'MiniNotifyNormal' },
+---   }
 --- <
 MiniNotify.make_notify = function(opts)
   local level_names = {}
@@ -343,7 +342,7 @@ end
 --- Add notification
 ---
 --- Add notification to history. It is considered "active" and is shown.
---- To hide, call |MiniNotfiy.remove()| with identifier this function returns.
+--- To hide, call |MiniNotify.remove()| with identifier this function returns.
 ---
 --- Example: >lua
 ---
