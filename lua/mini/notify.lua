@@ -815,12 +815,11 @@ H.window_compute_config = function(buf_id, is_for_open)
   if vim.is_callable(win_config) then win_config = win_config(buf_id) end
   local config = vim.tbl_deep_extend('force', default_config, win_config or {})
 
-  if type(config.title) == 'string' then config.title = H.fit_to_width(config.title, config.width) end
-
   -- Tweak config values to ensure they are proper, accounting for border
   local offset = config.border == 'none' and 0 or 2
   config.height = math.min(config.height, max_height - offset)
   config.width = math.min(config.width, max_width - offset)
+  if type(config.title) == 'string' then config.title = H.fit_to_width(config.title, config.width) end
 
   return config
 end
