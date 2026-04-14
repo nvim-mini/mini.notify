@@ -483,7 +483,7 @@ MiniNotify.refresh = function()
 
   -- Refresh buffer
   local buf_id = H.cache.buf_id
-  if not H.is_valid_buf(buf_id) then buf_id = H.buffer_create() end
+  if not H.is_loaded_buf(buf_id) then buf_id = H.buffer_create(buf_id) end
   H.buffer_refresh(buf_id, notif_arr)
 
   -- Refresh window
@@ -746,7 +746,8 @@ H.lsp_progress_handler = function(err, result, ctx, config)
 end
 
 -- Buffer ---------------------------------------------------------------------
-H.buffer_create = function()
+H.buffer_create = function(prev_buf_id)
+  pcall(vim.api.nvim_buf_delete, prev_buf_id, { force = true })
   local buf_id = vim.api.nvim_create_buf(false, true)
   H.set_buf_name(buf_id, 'content')
   vim.bo[buf_id].filetype = 'mininotify'
@@ -903,14 +904,15 @@ end
 
 H.set_buf_name = function(buf_id, name) vim.api.nvim_buf_set_name(buf_id, 'mininotify://' .. buf_id .. '/' .. name) end
 
-H.is_valid_buf = function(buf_id) return type(buf_id) == 'number' and vim.api.nvim_buf_is_valid(buf_id) end
+H.is_loaded_buf = function(buf_id) return type(buf_id) == 'number' and vim.api.nvim_buf_is_loaded(buf_id) end
 
 H.is_valid_win = function(win_id) return type(win_id) == 'number' and vim.api.nvim_win_is_valid(win_id) end
 
 H.is_win_in_tabpage = function(win_id) return vim.api.nvim_win_get_tabpage(win_id) == vim.api.nvim_get_current_tabpage() end
 
 H.is_textlock = function()
-  if not H.is_valid_buf(H.cache.textlock_buf_id) then
+  if not H.is_loaded_buf(H.cache.textlock_buf_id) then
+    pcall(vim.api.nvim_buf_delete, H.cache.textlock_buf_id, { force = true })
     H.cache.textlock_buf_id = vim.api.nvim_create_buf(false, true)
     H.set_buf_name(H.cache.textlock_buf_id, 'textlock-check-scratch')
   end
